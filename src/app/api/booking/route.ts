@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 import { getService } from "@/data/services";
+import { EmailNotConfiguredError, emailConfig, sendEmail } from "@/lib/email/resend";
+import { bookingEmail } from "@/lib/email/templates";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 
-/**
- * Nhận yêu cầu đặt lịch.
- * - Nếu cấu hình BOOKING_WEBHOOK_URL (Google Apps Script, Zapier, Make, Lark, Slack…),
- *   dữ liệu sẽ được chuyển tiếp dạng JSON.
- * - Nếu không, ghi log phía server (phù hợp môi trường dev).
- */
+/** Nhận yêu cầu đặt lịch và gửi email thông báo tới hộp thư CSKH qua Resend. */
 export async function POST(req: Request) {
   let body: Record<string, unknown>;
   try {
@@ -23,7 +21,7 @@ export async function POST(req: Request) {
   const str = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
   const name = str(body.name, 80);
   const phone = str(body.phone, 20).replace(/[\s.]/g, "");
-  const service = str(body.service, 60);
+  const serviceSlug = str(body.service, 60);
   const date = str(body.date, 10);
   const note = str(body.note, 500);
 
@@ -33,31 +31,38 @@ export async function POST(req: Request) {
   if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date))
     return NextResponse.json({ error: "Ngày không hợp lệ" }, { status: 422 });
 
-  const payload = {
+  if (!rateLimit(`booking:${clientIp(req)}`, 5)) {
+    return NextResponse.json(
+      { error: "Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau ít phút hoặc gọi hotline." },
+      { status: 429 },
+    );
+  }
+
+  const email = bookingEmail({
     name,
     phone,
-    service: service ? (getService(service)?.name ?? service) : "Cần tư vấn",
+    service: serviceSlug ? (getService(serviceSlug)?.name ?? serviceSlug) : "Cần bác sĩ tư vấn",
     date,
     note,
-    source: "website",
     createdAt: new Date().toISOString(),
-  };
+    page: req.headers.get("referer") ?? undefined,
+  });
 
-  const webhook = process.env.BOOKING_WEBHOOK_URL;
-  if (webhook) {
-    try {
-      const res = await fetch(webhook, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error(`Webhook ${res.status}`);
-    } catch (e) {
-      console.error("[booking] webhook error", e);
-      return NextResponse.json({ error: "Hệ thống bận, vui lòng gọi hotline" }, { status: 502 });
+  try {
+    const { id } = await sendEmail({
+      to: emailConfig().to,
+      ...email,
+      tags: [{ name: "type", value: "booking" }],
+    });
+    console.info(`[booking] email sent ${id}`);
+  } catch (e) {
+    if (e instanceof EmailNotConfiguredError && process.env.NODE_ENV !== "production") {
+      console.warn("[booking] RESEND_API_KEY chưa cấu hình – bỏ qua gửi email (dev)", { name, phone });
+      return NextResponse.json({ ok: true });
     }
-  } else {
-    console.info("[booking] new request", payload);
+    // Không để mất lead: ghi đầy đủ thông tin vào log để CSKH có thể liên hệ lại
+    console.error("[booking] send email failed – LEAD:", JSON.stringify({ name, phone, service: serviceSlug, date, note }), e);
+    return NextResponse.json({ error: "Hệ thống đang bận, vui lòng gọi hotline để đặt lịch." }, { status: 502 });
   }
 
   return NextResponse.json({ ok: true });

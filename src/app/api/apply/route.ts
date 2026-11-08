@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
 import { getJob } from "@/data/jobs";
+import { EmailNotConfiguredError, canEmailExternalRecipients, emailConfig, sendEmail } from "@/lib/email/resend";
+import { applicantConfirmationEmail, applicationEmail } from "@/lib/email/templates";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 
-/**
- * Nhận hồ sơ ứng tuyển.
- * Đặt RECRUIT_WEBHOOK_URL để chuyển tiếp (Google Apps Script, Zapier, Lark…);
- * nếu không có, chỉ ghi log phía server.
- */
+/** Nhận hồ sơ ứng tuyển và gửi email tới hộp thư CSKH qua Resend (reply-to = email ứng viên). */
 export async function POST(req: Request) {
   let body: Record<string, unknown>;
   try {
@@ -36,34 +35,42 @@ export async function POST(req: Request) {
   if (!isUrl(cv)) return NextResponse.json({ error: "Link CV cần bắt đầu bằng http:// hoặc https://" }, { status: 422 });
   if (portfolio && !isUrl(portfolio)) return NextResponse.json({ error: "Link Portfolio chưa hợp lệ" }, { status: 422 });
 
-  const payload = {
-    type: "ung-tuyen",
-    job: job.title,
-    name,
-    phone,
-    email,
-    cv,
-    portfolio,
-    note,
-    source: "website",
-    createdAt: new Date().toISOString(),
-  };
+  if (!rateLimit(`apply:${clientIp(req)}`, 3)) {
+    return NextResponse.json({ error: "Bạn đã gửi quá nhiều lần. Vui lòng thử lại sau ít phút." }, { status: 429 });
+  }
 
-  const webhook = process.env.RECRUIT_WEBHOOK_URL;
-  if (webhook) {
-    try {
-      const res = await fetch(webhook, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error(`Webhook ${res.status}`);
-    } catch (e) {
-      console.error("[apply] webhook error", e);
-      return NextResponse.json({ error: "Hệ thống bận, vui lòng thử lại sau" }, { status: 502 });
+  const data = { job: job.title, name, phone, email, cv, portfolio, note, createdAt: new Date().toISOString() };
+
+  try {
+    const { id } = await sendEmail({
+      to: emailConfig().to,
+      ...applicationEmail(data),
+      replyTo: email,
+      tags: [{ name: "type", value: "application" }],
+    });
+    console.info(`[apply] email sent ${id}`);
+  } catch (e) {
+    if (e instanceof EmailNotConfiguredError && process.env.NODE_ENV !== "production") {
+      console.warn("[apply] RESEND_API_KEY chưa cấu hình – bỏ qua gửi email (dev)", { name, job: job.title });
+      return NextResponse.json({ ok: true });
     }
-  } else {
-    console.info("[apply] new application", payload);
+    // Không để mất hồ sơ: ghi đầy đủ thông tin vào log
+    console.error("[apply] send email failed – APPLICATION:", JSON.stringify(data), e);
+    return NextResponse.json({ error: "Hệ thống đang bận, vui lòng thử lại sau." }, { status: 502 });
+  }
+
+  // Email xác nhận cho ứng viên – chỉ khi đã có tên miền gửi riêng; lỗi ở bước này không ảnh hưởng kết quả
+  if (canEmailExternalRecipients()) {
+    try {
+      await sendEmail({
+        to: email,
+        ...applicantConfirmationEmail(data),
+        replyTo: emailConfig().to[0],
+        tags: [{ name: "type", value: "application_confirm" }],
+      });
+    } catch (e) {
+      console.error("[apply] confirmation email failed", e);
+    }
   }
 
   return NextResponse.json({ ok: true });

@@ -48,20 +48,35 @@ npm run build && npm start   # production
 - **Bài viết**: `src/data/posts.ts`
 - **Ảnh**: `public/images/`
 
-## Form đặt lịch
+## Email thông báo (đặt lịch & ứng tuyển)
 
-`POST /api/booking` kiểm tra dữ liệu (họ tên, SĐT Việt Nam, ngày) và có honeypot chống spam.
-Đặt biến môi trường `BOOKING_WEBHOOK_URL` (xem `.env.example`) để chuyển tiếp dữ liệu sang Google Sheets (Apps Script),
-Zapier/Make, Lark, Slack… Nếu không đặt, yêu cầu chỉ được ghi log phía server.
+Hai form gửi email qua **[Resend](https://resend.com)** tới hộp thư CSKH (`MAIL_TO`, mặc định `cskh.lagoon.hanoi@gmail.com`):
+
+| Form | API | Email nhận được |
+|---|---|---|
+| Đặt lịch | `POST /api/booking` | `[Đặt lịch] Tên – SĐT – Dịch vụ`, nút **Gọi khách** / **Nhắn Zalo** |
+| Ứng tuyển | `POST /api/apply` | `[Ứng tuyển] Vị trí – Tên`, nút **Xem CV** / **Portfolio**; bấm *Trả lời* là trả lời thẳng ứng viên |
+
+- Kiểm tra dữ liệu phía server, honeypot chống bot, giới hạn tần suất theo IP (5 lượt đặt lịch, 3 lượt ứng tuyển / 10 phút).
+- Mẫu email: `src/lib/email/templates.ts`; client Resend: `src/lib/email/resend.ts`.
+- Cấu hình (xem `.env.example`): `RESEND_API_KEY`, `MAIL_TO`, `RESEND_FROM`.
+  - Dev: đặt trong `.env.local`. VPS: đặt trong `.env.production` (cả hai **không commit**).
+- **Tên miền gửi:** khi chưa xác minh tên miền, Resend chỉ cho gửi từ `onboarding@resend.dev` tới email của chủ tài khoản Resend.
+  Để gửi ổn định (và tự động gửi email xác nhận cho ứng viên), vào Resend → *Domains* → thêm `lagoonclinic.com`,
+  tạo các bản ghi DNS được cung cấp, rồi đặt `RESEND_FROM=Lagoon Clinic <no-reply@lagoonclinic.com>`.
 
 ## Việc cần làm trước khi go-live
 
-- [ ] Xác nhận giờ làm việc, link fanpage/Messenger, email, tên miền trong `src/data/site.ts` (đánh dấu `TODO`)
-- [ ] Cấu hình `BOOKING_WEBHOOK_URL` để nhận lead
+- [ ] Xác nhận giờ làm việc, link fanpage/Messenger, email trong `src/data/site.ts` (đánh dấu `TODO`)
+- [ ] Đặt `RESEND_API_KEY` trong `.env.production` trên server; xác minh tên miền gửi trên Resend
 - [ ] Thay ảnh không gian (hiện là ảnh concept trong Brand Guideline) bằng ảnh chụp thực tế phòng khám
 - [ ] Bổ sung thông tin bác sĩ, giấy phép hoạt động, ảnh trước/sau thật của khách hàng (có đồng ý)
 - [ ] Rà soát nội dung y khoa & quảng cáo theo quy định về quảng cáo dịch vụ khám chữa bệnh
 
-## Deploy
+## Deploy (VPS)
 
-Khuyến nghị **Vercel** (zero-config cho Next.js): import repo → thêm biến `BOOKING_WEBHOOK_URL` → Deploy.
+```bash
+cd /opt/lagoonclinic/lagoonclinic && git pull && npm ci && npm run build && pm2 reload lagoon
+```
+
+Biến môi trường đặt trong `.env.production` cạnh `package.json`; sau khi sửa file này chạy `pm2 restart lagoon`.
