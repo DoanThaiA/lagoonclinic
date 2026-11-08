@@ -26,6 +26,7 @@ Nội dung dịch vụ & bảng giá lấy từ *Menu dịch vụ* (catalog); m�
 /bai-viet, /bai-viet/[slug]   Blog kiến thức da liễu
 /lien-he                Thông tin liên hệ, bản đồ, form
 /dat-lich               Trang đặt lịch (hỗ trợ ?dv=<slug> để chọn sẵn dịch vụ)
+/tuyen-dung, /tuyen-dung/[slug]   Trang tuyển dụng + form ứng tuyển (dữ liệu: src/data/jobs.ts)
 /chinh-sach-bao-mat, /dieu-khoan
 /sitemap.xml, /robots.txt
 ```

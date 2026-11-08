@@ -50,6 +50,7 @@ export default function Footer() {
             <li><Link href="/bang-gia" className="hover:text-orange">Bảng giá</Link></li>
             <li><Link href="/bai-viet" className="hover:text-orange">Bài viết</Link></li>
             <li><Link href="/lien-he" className="hover:text-orange">Liên hệ</Link></li>
+            <li><Link href="/tuyen-dung" className="hover:text-orange">Tuyển dụng</Link></li>
             <li><Link href="/chinh-sach-bao-mat" className="hover:text-orange">Chính sách bảo mật</Link></li>
             <li><Link href="/dieu-khoan" className="hover:text-orange">Điều khoản sử dụng</Link></li>
           </ul>

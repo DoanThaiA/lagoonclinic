@@ -44,9 +44,14 @@ export default function Header() {
               <Clock className="h-3.5 w-3.5 text-orange" /> {site.hours}
             </span>
           </div>
-          <a href={site.phoneHref} className="flex items-center gap-1.5 font-semibold text-white hover:text-orange">
-            <Phone className="h-3.5 w-3.5 text-orange" /> Hotline: {site.phone}
-          </a>
+          <div className="flex items-center gap-5">
+            <Link href="/tuyen-dung" className="hover:text-orange">
+              Tuyển dụng
+            </Link>
+            <a href={site.phoneHref} className="flex items-center gap-1.5 font-semibold text-white hover:text-orange">
+              <Phone className="h-3.5 w-3.5 text-orange" /> Hotline: {site.phone}
+            </a>
+          </div>
         </div>
       </div>
 
@@ -192,6 +197,9 @@ export default function Header() {
               </Link>
             ),
           )}
+          <Link href="/tuyen-dung" className="block border-b border-line py-3.5 font-medium">
+            Tuyển dụng
+          </Link>
         </nav>
         <div className="space-y-3 border-t border-line p-5">
           <Link href="/dat-lich" className="btn btn-primary w-full">
