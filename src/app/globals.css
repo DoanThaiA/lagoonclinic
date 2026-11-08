@@ -1,26 +1,221 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ===== Lagoon Beauty – Brand tokens (theo Brand Guideline 12/2025) ===== */
+@theme {
+  --color-orange: #f47920; /* Lagoon Orange – màu chủ đạo */
+  --color-orange-600: #e0660f; /* nền nút (tăng tương phản chữ trắng) */
+  --color-orange-700: #b8520a; /* chữ cam trên nền sáng */
+  --color-orange-50: #fff4ec;
+  --color-orange-100: #ffe6d3;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-blue: #5dc4dd; /* Lagoon Blue – nền dịch vụ y khoa */
+  --color-blue-50: #eef9fc;
+  --color-blue-100: #d8f1f8;
+  --color-blue-700: #1f7f96;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --color-mint: #a6d8c0; /* Lagoon Mint Green */
+  --color-mint-50: #eef8f3;
+  --color-pink: #f7acbc; /* Lagoon Pink */
+  --color-pink-50: #fdf0f3;
+
+  --color-ink: #313032; /* Lagoon Black – màu chữ */
+  --color-ink-soft: #5b5a5e;
+  --color-line: #ece7e2;
+  --color-cream: #fffaf6;
+
+  --font-serif: var(--font-lora), Georgia, serif;
+  --font-sans: var(--font-barlow), system-ui, sans-serif;
+
+  --animate-fade-up: fade-up 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-float: float 7s ease-in-out infinite;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-12px);
+    }
   }
 }
 
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #ffffff;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-serif);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+::selection {
+  background: var(--color-orange-100);
+}
+
+@layer components {
+/* Hình giọt nước Lagoon – biểu tượng nhận diện */
+.drop-mask {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 130' preserveAspectRatio='none'%3E%3Cpath d='M50 0C50 0 100 52 100 85C100 110 77.6 130 50 130C22.4 130 0 110 0 85C0 52 50 0 50 0Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 130' preserveAspectRatio='none'%3E%3Cpath d='M50 0C50 0 100 52 100 85C100 110 77.6 130 50 130C22.4 130 0 110 0 85C0 52 50 0 50 0Z'/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+.arch {
+  border-radius: 999px 999px 28px 28px;
+}
+
+.container-x {
+  width: 100%;
+  max-width: 1240px;
+  margin-inline: auto;
+  padding-inline: 16px;
+}
+@media (min-width: 768px) {
+  .container-x {
+    padding-inline: 32px;
+  }
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-orange-700);
+}
+.eyebrow::before {
+  content: "";
+  width: 28px;
+  height: 2px;
+  background: var(--color-orange);
+  border-radius: 2px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.85rem 1.6rem;
+  font-weight: 600;
+  font-size: 0.98rem;
+  letter-spacing: 0.02em;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+  white-space: nowrap;
+}
+.btn:active {
+  transform: scale(0.98);
+}
+.btn-primary {
+  background: var(--color-orange-600);
+  color: #fff;
+  box-shadow: 0 10px 24px -10px rgb(224 102 15 / 0.7);
+}
+.btn-primary:hover {
+  background: var(--color-orange-700);
+}
+.btn-outline {
+  border: 1.5px solid currentColor;
+}
+.btn-outline:hover {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: #fff;
+}
+.btn-light {
+  background: #fff;
+  color: var(--color-ink);
+}
+.btn-light:hover {
+  background: var(--color-orange-50);
+}
+
+.prose-lagoon h2 {
+  font-size: 1.6rem;
+  margin: 2.2rem 0 0.8rem;
+}
+.prose-lagoon h3 {
+  font-size: 1.25rem;
+  margin: 1.6rem 0 0.6rem;
+}
+.prose-lagoon p {
+  margin: 0 0 1rem;
+  color: var(--color-ink-soft);
+}
+.prose-lagoon ul {
+  margin: 0 0 1.2rem;
+  padding-left: 1.2rem;
+  list-style: disc;
+  color: var(--color-ink-soft);
+}
+.prose-lagoon li {
+  margin-bottom: 0.4rem;
+}
+.prose-lagoon li::marker {
+  color: var(--color-orange);
+}
+.prose-lagoon strong {
+  color: var(--color-ink);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+
+.fade-bottom {
+  -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent);
+  mask-image: linear-gradient(to bottom, #000 78%, transparent);
+}
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
