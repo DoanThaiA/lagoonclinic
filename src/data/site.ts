@@ -11,7 +11,7 @@ export const site = {
   tagline: "Giải pháp trẻ hóa & Điều trị da công nghệ cao",
   description:
     "Lagoon – Phòng khám Chuyên khoa Da liễu tại Hà Nội. Trẻ hóa, nâng cơ, điều trị mụn, nám, sẹo và chăm sóc da chuyên sâu bằng công nghệ chuẩn y khoa: Ultherapy Prime, Thermage FLX, AviClear, Hollywood Spectra…",
-  url: "https://lagoonclinic.vn", // TODO: thay bằng tên miền chính thức
+  url: "https://lagoonclinic.com",
   address: "480 Xã Đàn, P. Văn Miếu - Quốc Tử Giám, TP. Hà Nội",
   phone: "0829.962.269",
   phoneHref: "tel:0829962269",
