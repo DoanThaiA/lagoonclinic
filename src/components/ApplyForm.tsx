@@ -33,8 +33,8 @@ export default function ApplyForm({ jobSlug, jobTitle }: { jobSlug: string; jobT
   }
 
   const field =
-    "w-full rounded-2xl border border-line bg-white px-4 py-3 text-[15px] text-ink outline-none transition placeholder:text-ink-soft/60 focus:border-orange focus:ring-4 focus:ring-orange/15";
-  const label = "mb-1.5 block text-[13px] font-semibold uppercase tracking-wider text-ink-soft";
+    "w-full rounded-2xl border border-line bg-white px-4 py-2.5 text-[15px] text-ink outline-none transition placeholder:text-ink-soft/60 focus:border-orange focus:ring-4 focus:ring-orange/15";
+  const label = "mb-1 block text-[12px] font-semibold uppercase tracking-wider text-ink-soft";
 
   if (status === "success") {
     return (
@@ -49,12 +49,12 @@ export default function ApplyForm({ jobSlug, jobTitle }: { jobSlug: string; jobT
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} className="space-y-3">
       <div>
         <label htmlFor="ap-name" className={label}>Họ và tên *</label>
         <input id="ap-name" name="name" required minLength={2} maxLength={80} autoComplete="name" className={field} placeholder="Nguyễn Thị A" />
       </div>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+      <div className="grid gap-3 sm:grid-cols-2">
         <div>
           <label htmlFor="ap-phone" className={label}>Số điện thoại *</label>
           <input id="ap-phone" name="phone" type="tel" inputMode="tel" required pattern="^(\+84|0)[0-9\s.]{8,12}$" autoComplete="tel" className={field} placeholder="09xx xxx xxx" />
@@ -67,7 +67,7 @@ export default function ApplyForm({ jobSlug, jobTitle }: { jobSlug: string; jobT
       <div>
         <label htmlFor="ap-cv" className={label}>Link CV *</label>
         <input id="ap-cv" name="cv" type="url" required maxLength={300} className={field} placeholder="https://drive.google.com/..." />
-        <p className="mt-1 text-xs text-ink-soft">Tải CV lên Google Drive và bật quyền xem “Bất kỳ ai có đường liên kết”.</p>
+        <p className="mt-1 text-xs text-ink-soft">Link Google Drive, bật quyền “Bất kỳ ai có đường liên kết”.</p>
       </div>
       <div>
         <label htmlFor="ap-portfolio" className={label}>Link Portfolio / sản phẩm</label>
@@ -75,7 +75,7 @@ export default function ApplyForm({ jobSlug, jobTitle }: { jobSlug: string; jobT
       </div>
       <div>
         <label htmlFor="ap-note" className={label}>Giới thiệu ngắn</label>
-        <textarea id="ap-note" name="note" rows={3} maxLength={1000} className={field} placeholder="Kinh nghiệm nổi bật, chiến dịch bạn tự hào nhất…" />
+        <textarea id="ap-note" name="note" rows={2} maxLength={1000} className={field} placeholder="Kinh nghiệm nổi bật, chiến dịch bạn tự hào nhất…" />
       </div>
       <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
       {status === "error" && <p className="text-sm font-medium text-red-500">{error}</p>}

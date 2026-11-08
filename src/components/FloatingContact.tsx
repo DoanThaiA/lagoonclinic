@@ -33,11 +33,15 @@ export default function FloatingContact() {
         <a
           href={site.phoneHref}
           aria-label={`Gọi ${site.phone}`}
-          className="relative flex h-14 items-center gap-2 rounded-full bg-orange-600 pl-4 pr-5 font-semibold text-white shadow-lg shadow-orange/40 transition hover:bg-orange-700"
+          title={`Gọi ${site.phone}`}
+          className="group relative flex h-14 min-w-14 items-center justify-center rounded-full bg-orange-600 px-[18px] font-semibold text-white shadow-lg shadow-orange/40 transition-all hover:bg-orange-700"
         >
           <span className="absolute inset-0 -z-10 animate-ping rounded-full bg-orange/40" />
-          <Phone className="h-5 w-5" />
-          {site.phone}
+          <Phone className="h-5 w-5 shrink-0" />
+          {/* Số điện thoại chỉ hiện khi rê chuột – tránh che nội dung/form bên phải */}
+          <span className="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-300 group-hover:ml-2 group-hover:max-w-[140px]">
+            {site.phone}
+          </span>
         </a>
       </div>
 

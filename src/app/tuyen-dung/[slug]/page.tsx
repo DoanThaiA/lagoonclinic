@@ -175,10 +175,10 @@ export default async function JobPage({ params }: Params) {
           </blockquote>
         </div>
 
-        <aside id="ung-tuyen" className="scroll-mt-32">
-          <div className="sticky top-32 rounded-[28px] border border-line bg-white p-6 shadow-[0_30px_60px_-45px_rgba(0,0,0,0.35)]">
+        <aside id="ung-tuyen" className="scroll-mt-28">
+          <div className="rounded-[28px] border border-line bg-white p-5 shadow-[0_30px_60px_-45px_rgba(0,0,0,0.35)] lg:sticky lg:top-28 lg:max-h-[calc(100dvh-8rem)] lg:overflow-y-auto">
             <p className="font-serif text-2xl text-ink">Ứng tuyển {j.title}</p>
-            <p className="mb-5 mt-1 text-sm text-ink-soft">Điền thông tin và gửi link CV, Portfolio của bạn.</p>
+            <p className="mb-4 mt-1 text-sm text-ink-soft">Điền thông tin và gửi link CV, Portfolio của bạn.</p>
             <ApplyForm jobSlug={j.slug} jobTitle={j.title} />
           </div>
         </aside>
